@@ -1,93 +1,128 @@
 lexer grammar SYsULexer;
 
-Int : 'int';
-Return : 'return';
+    Int : 'int';
+    Return : 'return';
+    Const : 'const';
+    Void : 'void';
+    If : 'if';
+    Else : 'else';
+    While : 'while';
+    Break : 'break';
+    Continue : 'continue';
 
-LeftParen : '(';
-RightParen : ')';
-LeftBracket : '[';
-RightBracket : ']';
-LeftBrace : '{';
-RightBrace : '}';
+    LeftParen : '(';
+    RightParen : ')';
+    LeftBracket : '[';
+    RightBracket : ']';
+    LeftBrace : '{';
+    RightBrace : '}';
 
-Plus : '+';
+    Plus : '+';
+    Minus : '-';
+    Star : '*';
+    Div : '/';
+    Percent : '%';
 
-Semi : ';';
-Comma : ',';
+    Ampamp : '&&';
+    Pipepipe : '||';
 
-Equal : '=';
+    Semi : ';';
+    Comma : ',';
 
-Identifier
-    :   IdentifierNondigit
-        (   IdentifierNondigit
-        |   Digit
-        )*
-    ;
+    Equalequal : '==';
+    Exclaimequal : '!=';
+    Greaterequal  : '>=';
+    Lessequal  : '<=';
+    Equal : '=';
+    Greater : '>';
+    Less : '<';
+    Exclaim : '!';
 
-fragment
-IdentifierNondigit
-    :   Nondigit
-    ;
+    Identifier
+        :   IdentifierNondigit
+            (   IdentifierNondigit
+            |   Digit
+            )*
+        ;
 
-fragment
-Nondigit
-    :   [a-zA-Z_]
-    ;
+    fragment
+    IdentifierNondigit
+        :   Nondigit
+        ;
 
-fragment
-Digit
-    :   [0-9]
-    ;
+    fragment
+    Nondigit
+        :   [a-zA-Z_]
+        ;
 
-Constant
-    :   IntegerConstant
-    ;
+    fragment
+    Digit
+        :   [0-9]
+        ;
 
-fragment
-IntegerConstant
-    :   DecimalConstant
-    |   OctalConstant
-    ;
+    Constant
+        :   IntegerConstant
+        ;
 
-fragment
-DecimalConstant
-    :   NonzeroDigit Digit*
-    ;
+    fragment
+    IntegerConstant
+        :   DecimalConstant
+        |   OctalConstant
+        |   HexadecimalConstant
+        ;
 
-fragment
-OctalConstant
-    :   '0' OctalDigit*
-    ;
+    fragment
+    DecimalConstant
+        :   NonzeroDigit Digit*
+        ;
 
+    fragment
+    OctalConstant
+        :   '0' OctalDigit*
+        ;
 
-fragment
-NonzeroDigit
-    :   [1-9]
-    ;
+    fragment
+    HexadecimalConstant
+        :   '0x' HexadecimalDigit*
+        ;
 
-fragment
-OctalDigit
-    :   [0-7]
-    ;
+    fragment
+    NonzeroDigit
+        :   [1-9]
+        ;
 
+    fragment
+    OctalDigit
+        :   [0-7]
+        ;
 
-// 预处理信息处理，可以从预处理信息中获得文件名以及行号
-// 预处理信息前面的数组即行号
-LineAfterPreprocessing
-    :   '#' Whitespace* ~[\r\n]*
-        -> skip
-    ;
+    fragment
+    HexadecimalDigit
+        :   [a-fA-F0-9]
+        ;
 
-Whitespace
-    :   [ \t]+
-        -> skip
-    ;
+    NonzeroHexadecimalDigit
+        :   [a-fA-F1-9]
+            -> skip
+        ;
 
-// 换行符号，可以利用这个信息来更新行号
-Newline
-    :   (   '\r' '\n'?
-        |   '\n'
-        )
-        -> skip
-    ;
+    // 预处理信息处理，可以从预处理信息中获得文件名以及行号
+    // 预处理信息前面的数组即行号
+    LineAfterPreprocessing
+        :   '#' Whitespace* ~[\r\n]*
+            //-> skip
+        ;
+
+    Whitespace
+        :   [ \t]+
+            //-> skip
+        ;
+
+    // 换行符号，可以利用这个信息来更新行号
+    Newline
+        :   (   '\r' '\n'?
+            |   '\n'
+            )
+            //-> skip
+        ;
 

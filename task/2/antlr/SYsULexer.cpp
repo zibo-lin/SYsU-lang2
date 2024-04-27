@@ -26,7 +26,27 @@ static const std::unordered_map<std::string, size_t> kClangTokens{
   { "minus", kMinus },
   { "comma", kComma },
   { "l_square", kLeftBracket },
-  { "r_square", kRightBracket }
+  { "r_square", kRightBracket },
+
+  { "const", kConst },
+  { "void", kVoid },
+  { "if", kIf },
+  { "else", kElse },
+  { "while", kWhile },
+  { "break", kBreak },
+  { "continue", kContinue },
+  { "greater", kGreater },
+  { "less", kLess },
+  { "ampamp", kAmpamp }, 
+  { "pipepipe", kPipepipe }, 
+  { "exclaim", kExclaim }, 
+  { "equalequal", kEqualequal },
+  { "exclaimequal", kExclaimequal },
+  { "greaterequal", kGreaterequal },
+  { "lessequal", kLessequal },
+  { "star", kStar },
+  { "slash", kDiv },
+  { "percent", kMod }
 };
 
 } // namespace

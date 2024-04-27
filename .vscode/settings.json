@@ -11,17 +11,17 @@
     "*.l": "lex",
     "*.y": "yacc",
     "CMakeLists.txt": "cmake",
-    "unordered_map": "cpp"
-  },
-
-  //* C/C++
-  "cmake.preferredGenerators": ["Ninja"],
-
-  //* python
-  "[python]": {
-    "editor.tabSize": 4,
-    "editor.rulers": [88],
-    "editor.formatOnType": true
+    "forward_list": "cpp",
+    "future": "cpp",
+    "variant": "cpp",
+    "__functional_base": "cpp",
+    "__functional_base_03": "cpp",
+    "__hash_table": "cpp",
+    "__tree": "cpp",
+    "__tuple": "cpp",
+    "filesystem": "cpp",
+    "queue": "cpp",
+    "stack": "cpp"
   },
   "flake8.args": ["--ignore=E203,W503", "--max-line-length=88"],
   "autoDocstring.docstringFormat": "one-line-sphinx"

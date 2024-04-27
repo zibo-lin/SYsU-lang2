@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <unordered_map>
+#include <string>
+#include <regex>
 
 // 映射定义，将ANTLR的tokenTypeName映射到clang的格式
 std::unordered_map<std::string, std::string> tokenTypeMapping = {
@@ -20,9 +22,37 @@ std::unordered_map<std::string, std::string> tokenTypeMapping = {
   { "Equal", "equal" },
   { "Plus", "plus" },
   { "Comma", "comma" },
-
   // 在这里继续添加其他映射
+  { "Const", "const" },
+  { "Void", "void" },
+  { "If", "if" },
+  { "Else", "else" },
+  { "While", "while" },
+  { "Break", "break" },
+  { "Continue", "continue" },
+  { "Greater", "greater" },
+  { "Less", "less" },
+  { "Ampamp", "ampamp" }, 
+  { "Pipepipe", "pipepipe" }, 
+  { "Exclaim", "exclaim" }, 
+  { "Equalequal", "equalequal" },
+  { "Exclaimequal", "exclaimequal" },
+  { "Greaterequal", "greaterequal" },
+  { "Lessequal", "lessequal" },
+  { "Minus", "minus" },
+  { "Star", "star" },
+  { "Div", "div" },
+  { "Percent", "percent" },
 };
+
+// 记录最新行数
+int roll_count = 0;
+// 记录最新文件地址
+std::string cfile_name = "";
+// 记录前置空格是否存在
+bool if_space = false;
+// 记录换行操作是否存在
+bool if_newline = false;
 
 void
 print_token(const antlr4::Token* token,
@@ -41,16 +71,90 @@ print_token(const antlr4::Token* token,
   if (tokenTypeMapping.find(tokenTypeName) != tokenTypeMapping.end()) {
     tokenTypeName = tokenTypeMapping[tokenTypeName];
   }
-  std::string locInfo = " Loc=<0:0>";
+
+  // 考虑出现预处理信息的情况
+  if (tokenTypeName=="LineAfterPreprocessing")
+  {
+    int num_catch = 2;
+    std::string roll_count_ = "";
+    std::string cfile_name_ = "";
+    for (auto ch : token->getText())
+    {
+      if (ch >= '0' && ch <= '9')
+      {
+        if (num_catch >= 1)
+        {
+          num_catch = 1;
+          roll_count_ += ch;
+        }
+      }
+      else
+      {
+        if (num_catch == 1)
+        num_catch = 0;
+      }
+    }
+    roll_count = std::stoi(roll_count_)-1;
+
+    bool addr_catch = false;
+    for (auto ch : token->getText())
+    {
+      if (ch == '\"')
+      {
+        addr_catch = addr_catch ? false : true;
+        continue;
+      }
+      if (addr_catch)
+      cfile_name_ += ch;
+    }
+    cfile_name = cfile_name_;
+    if_newline = true;
+    return;
+  }
+  // 考虑出现前置空格的情况
+  if (tokenTypeName=="Whitespace")
+  {
+    if_space = true;
+    return;
+  }
+  // 考虑出现换行的情况
+  if (tokenTypeName=="Newline")
+  {
+    roll_count ++;
+    if_newline = true;
+    return;
+  }
+
+  // 接下来考虑的都是出现有效token的情况
+  std::string locInfo = " Loc=<";
+  locInfo += cfile_name;
+  locInfo += ":";
+  //locInfo += std::to_string(token->getLine()-preroll_count);
+  locInfo += std::to_string(roll_count);
+  locInfo += ":";
+  if (token->getText() != "<EOF>")
+  locInfo += std::to_string(token->getCharPositionInLine()+1);
+  else locInfo += std::to_string(token->getCharPositionInLine());
+  locInfo += ">";
 
   bool startOfLine = false;
   bool leadingSpace = false;
+  if (if_space)
+  {
+    if_space = false;
+    leadingSpace = true;
+  }
+  if (if_newline)
+  {
+    if_newline = false;
+    startOfLine = true;
+  }
 
   if (token->getText() != "<EOF>")
     outFile << tokenTypeName << " '" << token->getText() << "'";
   else
     outFile << tokenTypeName << " '"
-            << "'";
+            << "'" ;
   if (startOfLine)
     outFile << "\t [StartOfLine]";
   if (leadingSpace)
@@ -88,7 +192,9 @@ main(int argc, char* argv[])
   antlr4::CommonTokenStream tokens(&lexer);
   tokens.fill();
 
+  
   for (auto&& token : tokens.getTokens()) {
     print_token(token, tokens, outFile, lexer);
   }
+  //outFile << lexer.getGrammarFileName();
 }

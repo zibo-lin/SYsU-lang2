@@ -19,8 +19,3 @@ int ifElseIf() {
 
   return a;
 }
-
-int main(){
-  putint(ifElseIf());
-  return 0;
-}

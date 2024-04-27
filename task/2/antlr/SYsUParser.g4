@@ -7,10 +7,12 @@ options {
 primaryExpression
     :   Identifier
     |   Constant
+    |   LeftParen expression RightParen
+    |   primaryExpression RightParen (boolorExpression (Comma boolorExpression)*)? LeftParen
     ;
 
 postfixExpression
-    :   primaryExpression  
+    :   primaryExpression (LeftBracket expression RightBracket)*
     ;
 
 unaryExpression
@@ -21,16 +23,31 @@ unaryExpression
     ;
 
 unaryOperator
-    :   Plus | Minus
+    :   Plus | Minus | Exclaim
+    ;
+    
+multiplicativeExpression
+    :   unaryExpression ((Star|Div|Mod) unaryExpression)*
     ;
 
 additiveExpression
-    :   unaryExpression ((Plus|Minus) unaryExpression)*
+    :   multiplicativeExpression ((Plus|Minus) multiplicativeExpression)*
     ;
 
+inequalExpression
+    :   additiveExpression ((Lessequal|Greaterequal|Exclaimequal|Equalequal|Less|Greater) additiveExpression)*
+    ;
+
+boolandExpression
+    :   inequalExpression ((Ampamp) inequalExpression)*
+    ;
+
+boolorExpression
+    :   boolandExpression ((Pipepipe) boolandExpression)*
+    ;
 
 assignmentExpression
-    :   additiveExpression
+    :   boolorExpression
     |   unaryExpression Equal assignmentExpression
     ;
 
@@ -61,7 +78,8 @@ initDeclarator
 
 
 typeSpecifier
-    :   Int
+    :   (Const? Int)
+    |   Void
     ;
 
 
@@ -92,6 +110,10 @@ statement
     :   compoundStatement
     |   expressionStatement
     |   jumpStatement
+    |   Break Semi
+    |   Continue Semi
+    |   If LeftParen expression RightParen statement (Else statement)?
+    |   While LeftParen expression RightParen statement
     ;
 
 compoundStatement
@@ -132,6 +154,6 @@ externalDeclaration
     ;
 
 functionDefinition
-    : declarationSpecifiers directDeclarator LeftParen RightParen compoundStatement
+    : declarationSpecifiers directDeclarator LeftParen (declarationSpecifiers initDeclarator (Comma declarationSpecifiers initDeclarator)*)? RightParen compoundStatement
     ;
 
